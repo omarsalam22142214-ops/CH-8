@@ -32,6 +32,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap; /* للسماح بنزول العناصر لو الشاشة صغيرة */
         }
 
         .admin-btn {
@@ -49,7 +50,7 @@
         .nav-buttons {
             display: flex;
             gap: 5px;
-            flex-wrap: wrap; /* عشان لو الشاشة صغيرة ينزلوا سطر جديد شيك */
+            flex-wrap: wrap;
         }
 
         /* توحيد كل زراير التحكم العلوية */
@@ -79,6 +80,31 @@
 
         .adblock-btn { background-color: #27ae60; }
         .adblock-btn.disabled { background-color: #c0392b; }
+
+        /* ستايل زرار الاكتشاف للـ WWE */
+        .fetch-wwe-btn {
+            background-color: #ff4757;
+            color: white;
+            border: 2px solid transparent;
+            padding: 6px 15px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+        }
+        .fetch-wwe-btn:hover {
+            background-color: #ff6b81;
+            transform: scale(1.05);
+        }
+        .fetch-wwe-btn:disabled {
+            background-color: #555;
+            color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
 
         /* شريط القنوات قابل للتمرير */
         .tabs-container {
@@ -132,6 +158,33 @@
             height: 100%;
             border: none;
         }
+
+        /* توست الإشعارات */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 9999999;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid #ff4757;
+            direction: rtl;
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
         /* لوحة التعديل */
         .modal {
@@ -192,20 +245,21 @@
                 <button class="nav-btn" onclick="prevStream()">السابق ⏮️</button>
                 <button class="nav-btn" onclick="nextStream()">التالي ⏭️</button>
                 <button class="rotate-btn" onclick="toggleRotation()">تدوير 🔄</button>
+                <button id="wweFetchBtn" class="fetch-wwe-btn" onclick="playRandomWWE()">🤼‍♂️ اكتشاف قناة WWE</button>
             </div>
 
             <button id="adblockBtn" class="adblock-btn disabled" onclick="toggleAdBlock()">🛡️ المانع (مقفول)</button>
         </div>
 
         <div class="tabs-container" id="mainTabs">
-            <button id="btn1" class="tab-btn active" data-link="https://dpv6ceilvhyrw.cloudfront.net/playlist.m3u8" onclick="playStream(this)">قناة 1</button>
+            <button id="btn1" class="tab-btn" data-link="https://dpv6ceilvhyrw.cloudfront.net/playlist.m3u8" onclick="playStream(this)">قناة 1</button>
             <button id="btn2" class="tab-btn" data-link="https://1max.top/live_menu.php" onclick="playStream(this)">قناة 2</button>
-            <button id="btn3" class="tab-btn" data-link="https://dailypudding.com/category/alpha.php?cache=15y6sumR&minify=sr&live=ch84_LQ&meu=84-85" onclick="playStream(this)">قناة 3</button>
+            <button id="btn3" class="tab-btn" data-link="https://dailypudding.com/category/alpha.php?cache=15y6sumR&amp;minify=sr&amp;live=ch84_LQ&amp;meu=84-85" onclick="playStream(this)">قناة 3</button>
             <button id="btn4" class="tab-btn" data-link="https://myuno.loreofeldenring.site/dailymotion/live/player/3/3" onclick="playStream(this)">قناة 4</button>
             <button id="btn5" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch85_LQ/" onclick="playStream(this)">قناة 5</button>
             <button id="btn6" class="tab-btn" data-link="https://1max.top/" onclick="playStream(this)">قناة 6</button>
             <button id="btn7" class="tab-btn" data-link="https://bollyrulezz.in/" onclick="playStream(this)">قناة 7</button>
-            <button id="btn8" class="tab-btn" data-link="https://live4m.com/embed1.php?channel=a29_USA_Network_Orig&waiting=1&background=grey" onclick="playStream(this)">قناة 8</button>
+            <button id="btn8" class="tab-btn" data-link="https://live4m.com/embed1.php?channel=a29_USA_Network_Orig&amp;waiting=1&amp;background=grey" onclick="playStream(this)">قناة 8</button>
             <button id="btn9" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch85_HD/" onclick="playStream(this)">قناة 9</button>
             <button id="btn10" class="tab-btn" data-link="https://vidsports.me/live.php?stream_ch=usan1" onclick="playStream(this)">قناة 10</button>
             <button id="btn11" class="tab-btn" data-link="https://vidsports.me/live.php?stream_ch=wwelve2" onclick="playStream(this)">قناة 11</button>
@@ -213,7 +267,7 @@
             <button id="btn13" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch83_LQ/" onclick="playStream(this)">قناة 13</button>
             <button id="btn14" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch81_LQ/" onclick="playStream(this)">قناة 14</button>
             <button id="btn15" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch82_LQ/" onclick="playStream(this)">قناة 15</button>
-            <button id="btn16" class="tab-btn" data-link="https://live4m.com/livetv.php?channel=a29_USA_Network_Orig&heading=USA_Network" onclick="playStream(this)">قناة 16</button>
+            <button id="btn16" class="tab-btn" data-link="https://live4m.com/livetv.php?channel=a29_USA_Network_Orig&amp;heading=USA_Network" onclick="playStream(this)">قناة 16</button>
             <button id="btn17" class="tab-btn" data-link="http://89.149.221.167:8080/live/86321000461/6731909777/87164.m3u8?token=Q1N4NlZKM0kxc2tUQmpt" onclick="playStream(this)">قناة 17</button>
             <button id="btn18" class="tab-btn" data-link="http://83.149.106.236:8080/hls/84a911b03bdeb53639ea95aadb1b723a/102808_2366.ts" onclick="playStream(this)">قناة 18</button>
         </div>
@@ -223,13 +277,15 @@
         <iframe id="videoPlayer" src="" allowfullscreen=""></iframe>
     </div>
 
+    <div id="toast"></div>
+
     <div id="settingsModal" class="modal" style="display: none;">
         <div class="modal-content">
             <h3 style="margin-top:0">إعدادات البث المباشر</h3>
             
             <div class="form-group">
                 <label>اختار الزرار للتعديل:</label>
-                <select id="buttonSelect" onchange="loadButtonData()"></select>
+                <select id="buttonSelect" onchange="loadButtonData()"><option value="btn1">قناة 1</option><option value="btn2">قناة 2</option><option value="btn3">قناة 3</option><option value="btn4">قناة 4</option><option value="btn5">قناة 5</option><option value="btn6">قناة 6</option><option value="btn7">قناة 7</option><option value="btn8">قناة 8</option><option value="btn9">قناة 9</option><option value="btn10">قناة 10</option><option value="btn11">قناة 11</option><option value="btn12">قناة 12</option><option value="btn13">قناة 13</option><option value="btn14">قناة 14</option><option value="btn15">قناة 15</option><option value="btn16">قناة 16</option><option value="btn17">قناة 17</option><option value="btn18">قناة 18</option></select>
             </div>
 
             <div class="form-group">
@@ -256,6 +312,14 @@
     </div>
 
     <script>
+        // دالة التوست للإشعارات
+        function showToast(msg) {
+            let toast = document.getElementById("toast");
+            toast.innerHTML = msg;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
         // سحب أسامي الزراير لقائمة التعديل
         function populateSelectMenu() {
             const selectMenu = document.getElementById('buttonSelect');
@@ -266,9 +330,10 @@
         }
         populateSelectMenu();
 
-        // تشغيل القناة الأولى بمجرد فتح الصفحة (عشان كل الزراير تتفعل صح)
+        // تشغيل القناة الأولى بمجرد فتح الصفحة
         window.onload = function() {
-            playStream(document.getElementById('btn1'));
+            let firstBtn = document.getElementById('btn1');
+            if(firstBtn) playStream(firstBtn);
         };
 
         let adblockEnabled = true;
@@ -298,7 +363,6 @@
             let link = btnElement.getAttribute('data-link');
             document.getElementById('videoPlayer').src = link;
             
-            // إظهار زراير الإغلاق والفتح الخارجي في الشريط العلوي كعنصر inline-block
             document.getElementById('closeVid').style.display = 'inline-block';
             document.getElementById('externalVid').style.display = 'inline-block';
 
@@ -437,5 +501,71 @@
             let videoWrapper = document.querySelector('.video-wrapper');
             videoWrapper.classList.toggle('rotated');
         }
+
+        // --- الدالة السحرية لاكتشاف قنوات WWE فقط ---
+        async function playRandomWWE() {
+            let btn = document.getElementById('wweFetchBtn');
+            let originalText = btn.innerHTML;
+            
+            btn.innerHTML = '🤼‍♂️🔍 جاري البحث...';
+            btn.disabled = true;
+            showToast("جاري اصطياد قناة مصارعة WWE... 🤼‍♂️🔍⏳");
+
+            try {
+                let response = await fetch('https://iptv-org.github.io/api/streams.json');
+                if (!response.ok) throw new Error("فشل الاتصال");
+                
+                let streams = await response.json();
+                
+                // كلمات مفتاحية لفلترة المصارعة فقط
+                let wweKeywords = ['wwe', 'wrestling', 'smackdown', 'raw', 'wrestlemania'];
+                
+                let workingStreams = streams.filter(stream => {
+                    let isOnline = stream.status === "online" || stream.status === undefined;
+                    let channelId = (stream.channel || "").toLowerCase();
+                    let isWWE = wweKeywords.some(kw => channelId.includes(kw));
+                    return isOnline && isWWE;
+                });
+
+                if (workingStreams.length === 0) {
+                    showToast("للأسف ملقيناش قنوات مصارعة شغالة حالياً ❌");
+                    return;
+                }
+
+                // اختيار قناة عشوائية من اللستة
+                let randomIndex = Math.floor(Math.random() * workingStreams.length);
+                let randomChannel = workingStreams[randomIndex];
+
+                // إنشاء زرار جديد في شريط القنوات
+                let newId = "btn_auto_wwe_" + new Date().getTime();
+                let newBtn = document.createElement("button");
+                newBtn.id = newId;
+                newBtn.className = "tab-btn";
+                newBtn.style.backgroundColor = "#ff4757"; // تمييز الزرار باللون الأحمر
+                newBtn.setAttribute("data-link", randomChannel.url);
+                
+                // تظبيط اسم القناة
+                let chName = randomChannel.channel ? randomChannel.channel.replace(/\..*$/, '').replace(/_/g, ' ').toUpperCase() : "WWE LIVE 🤼‍♂️";
+                newBtn.innerText = chName;
+                newBtn.setAttribute("onclick", "playStream(this)");
+
+                document.getElementById("mainTabs").appendChild(newBtn);
+                
+                showToast("عاش! لقطنا قناة مصارعة! جاري التشغيل... 🚀🤼‍♂️");
+                
+                // تشغيل القناة وعمل تمرير للزرار
+                playStream(newBtn);
+                newBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+            } catch (error) {
+                console.error("Error fetching WWE:", error);
+                showToast("حصلت مشكلة في الاتصال بقاعدة البيانات ❌");
+            } finally {
+                // إرجاع الزرار لحالته
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
     </script>
+
 </body></html>
