@@ -13,8 +13,8 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh; /* بياخد طول الشاشة كلها */
-            overflow: hidden; /* بيمنع ظهور سكرول للصفحة كلها */
+            height: 100vh;
+            overflow: hidden;
         }
 
         /* شريط التحكم العلوي للمشغل */
@@ -34,7 +34,6 @@
             gap: 10px;
         }
 
-        /* تصغير الزراير عشان تناسب شريط المشغل */
         .admin-btn {
             background-color: #f39c12;
             color: #000;
@@ -47,8 +46,12 @@
             transition: 0.3s;
         }
 
-        .adblock-btn {
-            background-color: #27ae60;
+        .nav-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-btn, .rotate-btn, .adblock-btn {
             color: white;
             border: none;
             padding: 6px 12px;
@@ -58,9 +61,17 @@
             font-weight: bold;
             transition: 0.3s;
         }
+
+        .nav-btn { background-color: #3498db; }
+        .nav-btn:hover { background-color: #2980b9; }
+
+        .rotate-btn { background-color: #9b59b6; }
+        .rotate-btn:hover { background-color: #8e44ad; }
+
+        .adblock-btn { background-color: #27ae60; }
         .adblock-btn.disabled { background-color: #c0392b; }
 
-        /* شريط القنوات قابل للتمرير لو القنوات كترت */
+        /* شريط القنوات قابل للتمرير */
         .tabs-container {
             display: flex;
             gap: 8px;
@@ -69,7 +80,6 @@
             padding-bottom: 5px;
         }
         
-        /* تجميل شكل السكرول بار بتاع القنوات */
         .tabs-container::-webkit-scrollbar { height: 6px; }
         .tabs-container::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
 
@@ -83,7 +93,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
-            flex-shrink: 0; /* بيمنع الزرار يكش */
+            flex-shrink: 0;
         }
 
         .tab-btn.active {
@@ -91,21 +101,26 @@
             border: 1px solid #fff;
         }
 
-        .tab-btn.hd { background-color: #b22222; }
-
-        /* تعديل الفيديو عشان يملى باقي المساحة */
+        /* تعديل الفيديو */
         .video-wrapper {
             position: relative;
             width: 100%;
-            flex-grow: 1; /* بياخد كل المساحة المتبقية من الشاشة */
+            flex-grow: 1;
             background-color: #000;
         }
 
-        .close-vid-btn {
+        .video-wrapper.rotated iframe {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: calc(100vh - 75px);
+            height: 100vw;
+            transform: translate(-50%, -50%) rotate(90deg);
+        }
+
+        .close-vid-btn, .external-vid-btn {
             position: absolute;
             top: 10px;
-            left: 10px; 
-            background-color: rgba(255, 0, 0, 0.8);
             color: white;
             border: 2px solid white;
             border-radius: 50%;
@@ -115,31 +130,21 @@
             font-weight: bold;
             cursor: pointer;
             z-index: 10;
-            display: none; 
+            display: flex; 
             align-items: center;
             justify-content: center;
             transition: 0.3s;
+        }
+
+        .close-vid-btn {
+            left: 10px; 
+            background-color: rgba(255, 0, 0, 0.8);
         }
         .close-vid-btn:hover { background-color: red; transform: scale(1.1); }
 
         .external-vid-btn {
-            position: absolute;
-            top: 10px;
             right: 10px; 
             background-color: rgba(41, 128, 185, 0.8); 
-            color: white;
-            border: 2px solid white;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 10;
-            display: none; 
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
         }
         .external-vid-btn:hover { background-color: #2980b9; transform: scale(1.1); }
 
@@ -149,7 +154,7 @@
             border: none;
         }
 
-        /* لوحة التعديل زي ما هي */
+        /* لوحة التعديل */
         .modal {
             display: none;
             position: fixed;
@@ -201,28 +206,42 @@
     <div class="player-header">
         <div class="top-controls">
             <button class="admin-btn" onclick="openModal()">⚙️ التعديل</button>
-            <button id="adblockBtn" class="adblock-btn" onclick="toggleAdBlock()">🛡️ المانع (شغال)</button>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" onclick="prevStream()">السابق ⏮️</button>
+                <button class="nav-btn" onclick="nextStream()">التالي ⏭️</button>
+                <button class="rotate-btn" onclick="toggleRotation()">تدوير 🔄</button>
+            </div>
+
+            <button id="adblockBtn" class="adblock-btn disabled" onclick="toggleAdBlock()">🛡️ المانع (مقفول)</button>
         </div>
 
         <div class="tabs-container" id="mainTabs">
-            <button id="btn1" class="tab-btn" data-link="https://15.wwwkoora.com/albaplayer/bein-sports-hd-8/" onclick="playStream(this)">قناة 8 بس</button>
-            <button id="btn2" class="tab-btn" data-link="https://p4.panda-live.live/albaplayer/bein-8/" onclick="playStream(this)">8</button>
-            <button id="btn3" class="tab-btn" data-link="https://tv12.koora-plus.top/chtv/ch8.php" onclick="playStream(this)">8</button>
-            <button id="btn4" class="tab-btn hd" data-link="https://12.sportsurges.online/albaplayer/bein-8/?serv=1" onclick="playStream(this)">8</button>
-            <button id="btn_new_1775313046421" class="tab-btn" data-link="https://plir.bein4kora.com/albaplayer/1bnnn8/" onclick="playStream(this)">8</button>
-            <button id="btn_new_1775313087333" class="tab-btn" data-link="https://1.simosports.live/splayer/Live8.php" onclick="playStream(this)">8</button>
-            <button id="btn_new_1775313110293" class="tab-btn" data-link="https://spoort.en-yalla.live/albaplayer/sport8/" onclick="playStream(this)">8</button>
-            <button id="btn_new_1775313127961" class="tab-btn" data-link="https://bbb.yallashoot2026.com/albaplayer/sports-8/" onclick="playStream(this)">8</button>
-            <button id="btn_new_1775313144818" class="tab-btn" data-link="https://a8.sia-koora.live/albaplayer/bein-8/" onclick="playStream(this)">8</button>
-            <button id="btn_new_1775313162951" class="tab-btn" data-link="https://vip.kora-top.zip/frame.php?ch=b1&amp;p=12&amp;token=3ee4a19b-5195-4718-9f39-1641c06163cf&amp;kt=1774719427" onclick="playStream(this)">8</button>
-        <button id="btn_new_1775316025265" class="tab-btn" data-link="http://scorpioniptv.com:2052/live/babatayoub/deyswmq/3300.ts" onclick="playStream(this)">8</button></div>
+            <button id="btn1" class="tab-btn active" data-link="https://dpv6ceilvhyrw.cloudfront.net/playlist.m3u8" onclick="playStream(this)">قناة 1</button>
+            <button id="btn2" class="tab-btn" data-link="https://1max.top/live_menu.php" onclick="playStream(this)">قناة 2</button>
+            <button id="btn3" class="tab-btn" data-link="https://dailypudding.com/category/alpha.php?cache=15y6sumR&minify=sr&live=ch84_LQ&meu=84-85" onclick="playStream(this)">قناة 3</button>
+            <button id="btn4" class="tab-btn" data-link="https://myuno.loreofeldenring.site/dailymotion/live/player/3/3" onclick="playStream(this)">قناة 4</button>
+            <button id="btn5" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch85_LQ/" onclick="playStream(this)">قناة 5</button>
+            <button id="btn6" class="tab-btn" data-link="https://1max.top/" onclick="playStream(this)">قناة 6</button>
+            <button id="btn7" class="tab-btn" data-link="https://bollyrulezz.in/" onclick="playStream(this)">قناة 7</button>
+            <button id="btn8" class="tab-btn" data-link="https://live4m.com/embed1.php?channel=a29_USA_Network_Orig&waiting=1&background=grey" onclick="playStream(this)">قناة 8</button>
+            <button id="btn9" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch85_HD/" onclick="playStream(this)">قناة 9</button>
+            <button id="btn10" class="tab-btn" data-link="https://vidsports.me/live.php?stream_ch=usan1" onclick="playStream(this)">قناة 10</button>
+            <button id="btn11" class="tab-btn" data-link="https://vidsports.me/live.php?stream_ch=wwelve2" onclick="playStream(this)">قناة 11</button>
+            <button id="btn12" class="tab-btn" data-link="https://heelclub.site/" onclick="playStream(this)">قناة 12</button>
+            <button id="btn13" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch83_LQ/" onclick="playStream(this)">قناة 13</button>
+            <button id="btn14" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch81_LQ/" onclick="playStream(this)">قناة 14</button>
+            <button id="btn15" class="tab-btn" data-link="https://www.sawlivenow.com/embed/ch82_LQ/" onclick="playStream(this)">قناة 15</button>
+            <button id="btn16" class="tab-btn" data-link="https://live4m.com/livetv.php?channel=a29_USA_Network_Orig&heading=USA_Network" onclick="playStream(this)">قناة 16</button>
+            <button id="btn17" class="tab-btn" data-link="http://89.149.221.167:8080/live/86321000461/6731909777/87164.m3u8?token=Q1N4NlZKM0kxc2tUQmpt" onclick="playStream(this)">قناة 17</button>
+            <button id="btn18" class="tab-btn" data-link="http://83.149.106.236:8080/hls/84a911b03bdeb53639ea95aadb1b723a/102808_2366.ts" onclick="playStream(this)">قناة 18</button>
+        </div>
     </div>
 
     <div class="video-wrapper">
-        <button id="closeVid" class="close-vid-btn" onclick="closePlayer()" title="إغلاق المشغل" style="display: none;">✖</button>
-        <button id="externalVid" class="external-vid-btn" onclick="openExternal()" title="فتح في نافذة خارجية" style="display: none;">↗️</button>
-        
-        <iframe id="videoPlayer" src="" allowfullscreen="" sandbox="allow-scripts allow-same-origin"></iframe>
+        <button id="closeVid" class="close-vid-btn" onclick="closePlayer()">✖</button>
+        <button id="externalVid" class="external-vid-btn" onclick="openExternal()">↗</button>
+        <iframe id="videoPlayer" src="https://dpv6ceilvhyrw.cloudfront.net/playlist.m3u8" allowfullscreen=""></iframe>
     </div>
 
     <div id="settingsModal" class="modal" style="display: none;">
@@ -232,17 +251,7 @@
             <div class="form-group">
                 <label>اختار الزرار للتعديل:</label>
                 <select id="buttonSelect" onchange="loadButtonData()">
-                    <option value="btn1">قناة 8 بس</option>
-                    <option value="btn2">8</option>
-                    <option value="btn3">8</option>
-                    <option value="btn4">8</option>
-                    <option value="btn_new_1775313046421">8</option>
-                    <option value="btn_new_1775313087333">8</option>
-                    <option value="btn_new_1775313110293">8</option>
-                    <option value="btn_new_1775313127961">8</option>
-                    <option value="btn_new_1775313144818">8</option>
-                    <option value="btn_new_1775313162951">8</option>
-                <option value="btn_new_1775316025265">8</option></select>
+                    </select>
             </div>
 
             <div class="form-group">
@@ -269,6 +278,18 @@
     </div>
 
     <script>
+        // دالة بتسحب أسامي الزراير اللي في الشريط وتحطها في قائمة التعديل
+        function populateSelectMenu() {
+            const selectMenu = document.getElementById('buttonSelect');
+            selectMenu.innerHTML = ''; 
+            document.querySelectorAll('#mainTabs .tab-btn').forEach(btn => {
+                selectMenu.innerHTML += `<option value="${btn.id}">${btn.innerText}</option>`;
+            });
+        }
+
+        // تشغيلها أول ما الصفحة تفتح
+        populateSelectMenu();
+
         // دالة مانع الإعلانات
         let adblockEnabled = true;
         function toggleAdBlock() {
@@ -297,6 +318,7 @@
             let link = btnElement.getAttribute('data-link');
             document.getElementById('videoPlayer').src = link;
             
+            // إظهار زراير الإغلاق والفتح الخارجي
             document.getElementById('closeVid').style.display = 'flex';
             document.getElementById('externalVid').style.display = 'flex';
 
@@ -323,6 +345,7 @@
         }
 
         function openModal() {
+            populateSelectMenu(); // تحديث القائمة قبل الفتح عشان لو ضفنا حاجة جديدة
             document.getElementById('settingsModal').style.display = 'flex';
             loadButtonData();
         }
@@ -374,11 +397,8 @@
 
             document.getElementById("mainTabs").appendChild(newBtn);
 
-            let newOption = document.createElement("option");
-            newOption.value = newId;
-            newOption.innerText = channelName;
-            document.getElementById("buttonSelect").appendChild(newOption);
-
+            // تحديث القائمة بتاعة التعديل
+            populateSelectMenu();
             document.getElementById("buttonSelect").value = newId;
             loadButtonData();
 
@@ -406,6 +426,37 @@
                 });
             }, 100);
         }
+
+        // دالة الانتقال للسيرفر التالي
+        function nextStream() {
+            let tabs = Array.from(document.querySelectorAll('#mainTabs .tab-btn'));
+            if (tabs.length === 0) return;
+
+            let activeIndex = tabs.findIndex(btn => btn.classList.contains('active'));
+            let nextIndex = (activeIndex + 1) % tabs.length; 
+            
+            playStream(tabs[nextIndex]);
+            tabs[nextIndex].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+
+        // دالة الانتقال للسيرفر السابق
+        function prevStream() {
+            let tabs = Array.from(document.querySelectorAll('#mainTabs .tab-btn'));
+            if (tabs.length === 0) return;
+
+            let activeIndex = tabs.findIndex(btn => btn.classList.contains('active'));
+            if (activeIndex === -1) activeIndex = 0;
+
+            let prevIndex = (activeIndex - 1 + tabs.length) % tabs.length; 
+            
+            playStream(tabs[prevIndex]);
+            tabs[prevIndex].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+
+        // دالة تدوير الشاشة
+        function toggleRotation() {
+            let videoWrapper = document.querySelector('.video-wrapper');
+            videoWrapper.classList.toggle('rotated');
+        }
     </script>
-</body>
-</html>
+</body></html>
