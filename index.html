@@ -17,7 +17,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden;
+            overflow: auto;
         }
 
         /* شريط التحكم العلوي للمشغل */
@@ -119,7 +119,7 @@
         .video-wrapper {
             position: relative;
             width: 100%;
-            flex-grow: 1;
+            height: 60vh;
             background-color: #000;
         }
 
@@ -281,7 +281,7 @@
                 <button class="rotate-btn" onclick="toggleRotation()">تدوير 🔄</button>
             </div>
 
-            <button id="adblockBtn" class="adblock-btn disabled" onclick="toggleAdBlock()">🛡️ المانع (مقفول)</button>
+            <button id="adblockBtn" class="adblock-btn" onclick="toggleAdBlock()">🛡️ المانع (شغال)</button>
         </div>
 
         <div class="tabs-container" id="mainTabs"><button id="btn1" class="tab-btn" data-link="https://dpv6ceilvhyrw.cloudfront.net/playlist.m3u8" onclick="playStream(this)">قناة 1</button>
@@ -306,7 +306,7 @@
     </div>
 
     <div class="video-wrapper">
-        <iframe id="iframePlayer" src="" allowfullscreen="" style="display: none;"></iframe>
+        <iframe id="iframePlayer" src="" allowfullscreen="" style="display: none;" sandbox="allow-scripts allow-same-origin"></iframe>
         <video id="videoPlayer" controls="" autoplay="" style="display: none;"></video>
     </div>
 
