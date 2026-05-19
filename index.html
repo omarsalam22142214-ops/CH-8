@@ -123,6 +123,19 @@
             direction: rtl;
         }
 
+        /* ستايل شارات الحالة والجودة */
+        .status-badge, .quality-badge {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid rgba(52, 73, 94, 0.8);
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
         .nav-btn { background-color: rgba(52, 152, 219, 0.9); }
         .nav-btn:hover { background-color: #2980b9; }
         .rotate-btn { background-color: rgba(155, 89, 182, 0.9); }
@@ -359,6 +372,9 @@
             </div>
             
             <div class="nav-buttons">
+                <div id="streamStatusBadge" class="status-badge" style="color: rgb(231, 76, 60);">🔴 قاطع / خطأ</div>
+                <div id="streamQualityBadge" class="quality-badge" style="display: none; color: rgb(52, 152, 219);">📺 1080p</div>
+
                 <div class="interval-input-group">
                     <label>المدة (5-60ث):</label>
                     <input type="number" id="autoSwitchIntervalInput" value="20" min="5" max="60" onchange="updateAutoSwitchInterval()" data-ddg-inputtype="unknown">
@@ -542,22 +558,53 @@
         let remainingSeconds = 20; 
         let activeLinkType = 'iframe'; 
 
-        // === دالة التشغيل المباشر من اللينك ===
+        // === دوال التحكم في حالة البث والجودة ===
+        function updateStreamStatus(state) {
+            let statusBadge = document.getElementById('streamStatusBadge');
+            if(state === 'loading') {
+                statusBadge.innerHTML = '⏳ بيحمل...';
+                statusBadge.style.color = '#f1c40f';
+            } else if (state === 'playing') {
+                statusBadge.innerHTML = '🟢 شغال';
+                statusBadge.style.color = '#2ecc71';
+            } else if (state === 'error') {
+                statusBadge.innerHTML = '🔴 قاطع / خطأ';
+                statusBadge.style.color = '#e74c3c';
+            } else if (state === 'idle') {
+                statusBadge.innerHTML = '⚪ في الانتظار';
+                statusBadge.style.color = '#bdc3c7';
+            }
+        }
+
+        // ربط مشغل الفيديو بأحداث الحالة
+        document.addEventListener("DOMContentLoaded", () => {
+            let video = document.getElementById('videoPlayer');
+            let iframe = document.getElementById('iframePlayer');
+            
+            video.addEventListener('playing', () => updateStreamStatus('playing'));
+            video.addEventListener('waiting', () => updateStreamStatus('loading'));
+            video.addEventListener('error', () => updateStreamStatus('error'));
+
+            iframe.addEventListener('load', () => {
+                if(activeLinkType === 'iframe' && iframe.src) {
+                    updateStreamStatus('playing');
+                }
+            });
+        });
+        // ===================================
+
         function playDirectLink() {
             let link = document.getElementById('directLinkInput').value.trim();
             if (!link) {
                 alert("حط الرابط الأول عشان يشتغل!");
                 return;
             }
-            // إنشاء زرار وهمي عشان دالة التشغيل تفهمه
             let tempBtn = document.createElement("button");
             tempBtn.setAttribute("data-link", link);
             tempBtn.setAttribute("data-open", "internal");
             playStream(tempBtn);
         }
-        // ===================================
 
-        // === تفعيل الزوم ===
         let currentZoom = 1;
         const zoomStep = 0.1;
 
@@ -582,9 +629,7 @@
             document.querySelector('.video-wrapper').style.setProperty('--zoom-level', currentZoom);
             document.getElementById('zoomResetBtn').innerText = Math.round(currentZoom * 100) + '%';
         }
-        // ==================
 
-        // دالة لتحديث الثواني المختارة والتأكد من الحدود
         function updateAutoSwitchInterval() {
             let input = document.getElementById('autoSwitchIntervalInput');
             let val = parseInt(input.value);
@@ -592,7 +637,6 @@
             if (val > 60) val = 60;
             input.value = val;
             
-            // إذا كان التقليب شغال، نحدث العداد فوراً
             if (autoSwitchInterval) {
                 remainingSeconds = val;
                 document.getElementById('autoSwitchBtn').innerText = `شغال (${remainingSeconds}) ⏱️`;
@@ -799,15 +843,21 @@
             let target = btnElement.getAttribute('data-open') || 'internal'; 
             if(!originalLink) return;
 
+            document.getElementById('directLinkInput').value = originalLink;
+
             if (target === 'external') {
                 window.open(originalLink, '_blank');
                 return; 
             }
 
-            // إعادة تعيين الزوم مع كل قناة جديدة
+            // تصفير وتجهيز شارات الحالة
+            updateStreamStatus('loading');
+            let qualityBadge = document.getElementById('streamQualityBadge');
+            qualityBadge.style.display = 'none';
+            qualityBadge.innerHTML = '📺 --';
+
             currentZoom = 1;
             updateZoom();
-            // إعادة ضبط زرار الصوت مع القناة الجديدة
             document.getElementById('muteBtn').innerText = '🔊 الصوت';
 
             let iframe = document.getElementById('iframePlayer');
@@ -830,12 +880,29 @@
                 activeLinkType = 'video';
                 iframe.style.display = 'none';
                 video.style.display = 'block';
-                video.muted = false; // تشغيل الصوت افتراضيا
+                video.muted = false; 
                 
                 if (Hls.isSupported() && linkToPlay.includes('.m3u8')) {
                     window.hls = new Hls();
                     window.hls.loadSource(linkToPlay);
                     window.hls.attachMedia(video);
+                    
+                    // قراءة الجودة عند توفرها أو تغيرها
+                    window.hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
+                        let level = window.hls.levels[data.level];
+                        if(level && level.height) {
+                            qualityBadge.style.display = 'flex';
+                            qualityBadge.innerHTML = `📺 ${level.height}p`;
+                        }
+                    });
+
+                    // مراقبة الأخطاء
+                    window.hls.on(Hls.Events.ERROR, function(event, data) {
+                        if (data.fatal) {
+                            updateStreamStatus('error');
+                        }
+                    });
+
                     window.hls.on(Hls.Events.MANIFEST_PARSED, function() {
                         let playPromise = video.play();
                         if (playPromise !== undefined) {
@@ -871,7 +938,6 @@
             document.getElementById('externalVid').style.display = 'inline-block';
             document.getElementById('copyLinkBtn').style.display = 'inline-block';
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            // التحقق عشان لو زرار وهمي من التشغيل المباشر مايعملش خطأ
             if(btnElement.id) {
                 btnElement.classList.add('active');
             }
@@ -888,6 +954,8 @@
             if (window.hls) {
                 try { window.hls.destroy(); } catch(e) {}
             }
+            updateStreamStatus('idle');
+            document.getElementById('streamQualityBadge').style.display = 'none';
             document.getElementById('closeVid').style.display = 'none';
             document.getElementById('externalVid').style.display = 'none';
             document.getElementById('copyLinkBtn').style.display = 'none';
@@ -898,7 +966,6 @@
             let activeBtn = document.querySelector('.tab-btn.active');
             if (activeBtn) window.open(activeBtn.getAttribute('data-link'), '_blank');
             else {
-                // لو كان شغال من الرابط المباشر ومافيش زرار active
                 let directLink = document.getElementById('directLinkInput').value.trim();
                 if(directLink) window.open(directLink, '_blank');
             }
@@ -908,7 +975,6 @@
             let activeBtn = document.querySelector('.tab-btn.active');
             if (activeBtn) triggerCopy(activeBtn.getAttribute('data-link'), "تم النسخ!");
             else {
-                // لو كان شغال من الرابط المباشر
                 let directLink = document.getElementById('directLinkInput').value.trim();
                 if(directLink) triggerCopy(directLink, "تم النسخ!");
             }
@@ -989,7 +1055,6 @@
             triggerCopy(content, "تم نسخ الكود بالكامل!");
         }
 
-        // --- دالة استخراج كل القنوات لملف M3U8 ---
         function exportToM3U() {
             closeModal();
             let m3uContent = "#EXTM3U\n";
@@ -1008,7 +1073,6 @@
             a.click();
         }
 
-        // --- دالة استخراج القنوات المحددة بس لملف M3U8 ---
         function exportSelectedToM3U() {
             let selected = document.querySelectorAll('#mainTabs .tab-btn.selected-channel');
             if (selected.length === 0) { alert("حدد قنوات الأول عشان تعملها ملف M3U8!"); return; }
@@ -1051,7 +1115,6 @@
 
         function toggleRotation() { document.querySelector('.video-wrapper').classList.toggle('rotated'); }
 
-        // === دوال الصوت وملء الشاشة الجديدة ===
         function toggleMute() {
             let video = document.getElementById('videoPlayer');
             let muteBtn = document.getElementById('muteBtn');
