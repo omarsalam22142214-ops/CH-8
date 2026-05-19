@@ -371,7 +371,10 @@
 
                 <button id="zoomInBtn" class="nav-btn" style="background-color: #34495e;" title="تكبير">تكبير ➕</button>
                 <button id="zoomOutBtn" class="nav-btn" style="background-color: #34495e;" title="تصغير">تصغير ➖</button>
-                <button id="zoomResetBtn" class="nav-btn" style="background-color: #7f8c8d; color: white;" title="الوضع الافتراضي">50%</button>
+                <button id="zoomResetBtn" class="nav-btn" style="background-color: #7f8c8d; color: white;" title="الوضع الافتراضي">100%</button>
+                
+                <button id="muteBtn" class="nav-btn" style="background-color: #2c3e50;" onclick="toggleMute()">🔊 الصوت</button>
+                <button id="fullscreenBtn" class="nav-btn" style="background-color: #2c3e50;" onclick="toggleFullScreen()">🔲 ملء الشاشة</button>
 
                 <button id="closeVid" class="close-top-btn" onclick="closePlayer()" style="display: none;">إغلاق ✖</button>
                 <button id="externalVid" class="external-top-btn" onclick="openExternal()" style="display: none;">خارجي ↗</button>
@@ -445,7 +448,7 @@
 </div>
     </div>
 
-    <div class="video-wrapper" style="--zoom-level: 0.5000000000000001;">
+    <div class="video-wrapper" style="--zoom-level: 1;">
         <iframe id="iframePlayer" src="" allowfullscreen="" style="display: none;" sandbox="allow-scripts allow-same-origin"></iframe>
         <video id="videoPlayer" controls="" autoplay="" playsinline="" style="display: none;"></video>
     </div>
@@ -511,6 +514,29 @@
     </div>
 
     <script>
+        // === التعديل الجديد: إجبار أي نافذة جديدة أو رابط خارجي إنه يفتح جوه المشغل ===
+        window.open = function(url) {
+            if (url) {
+                let tempBtn = document.createElement("button");
+                tempBtn.setAttribute("data-link", url);
+                tempBtn.setAttribute("data-open", "internal");
+                playStream(tempBtn);
+            }
+            return null;
+        };
+
+        document.addEventListener('click', function(e) {
+            let link = e.target.closest('a');
+            if (link && (link.getAttribute('target') === '_blank' || link.target === '_blank')) {
+                e.preventDefault();
+                let tempBtn = document.createElement("button");
+                tempBtn.setAttribute("data-link", link.href);
+                tempBtn.setAttribute("data-open", "internal");
+                playStream(tempBtn);
+            }
+        });
+        // =======================================================================
+
         let isSelectionMode = false;
         let autoSwitchInterval = null; 
         let remainingSeconds = 20; 
@@ -781,6 +807,8 @@
             // إعادة تعيين الزوم مع كل قناة جديدة
             currentZoom = 1;
             updateZoom();
+            // إعادة ضبط زرار الصوت مع القناة الجديدة
+            document.getElementById('muteBtn').innerText = '🔊 الصوت';
 
             let iframe = document.getElementById('iframePlayer');
             let video = document.getElementById('videoPlayer');
@@ -802,6 +830,7 @@
                 activeLinkType = 'video';
                 iframe.style.display = 'none';
                 video.style.display = 'block';
+                video.muted = false; // تشغيل الصوت افتراضيا
                 
                 if (Hls.isSupported() && linkToPlay.includes('.m3u8')) {
                     window.hls = new Hls();
@@ -1021,5 +1050,38 @@
         }
 
         function toggleRotation() { document.querySelector('.video-wrapper').classList.toggle('rotated'); }
+
+        // === دوال الصوت وملء الشاشة الجديدة ===
+        function toggleMute() {
+            let video = document.getElementById('videoPlayer');
+            let muteBtn = document.getElementById('muteBtn');
+            if (activeLinkType === 'video') {
+                video.muted = !video.muted;
+                muteBtn.innerText = video.muted ? '🔇 مكتوم' : '🔊 الصوت';
+            } else {
+                alert("زرار الصوت بيشتغل بس مع الروابط المباشرة (m3u8 أو mp4). المواقع الكاملة لازم تتحكم في صوتها من المشغل بتاعهم جوه الصفحة.");
+            }
+        }
+
+        function toggleFullScreen() {
+            let wrapper = document.querySelector('.video-wrapper');
+            if (!document.fullscreenElement) {
+                if (wrapper.requestFullscreen) {
+                    wrapper.requestFullscreen();
+                } else if (wrapper.webkitRequestFullscreen) { /* Safari */
+                    wrapper.webkitRequestFullscreen();
+                } else if (wrapper.msRequestFullscreen) { /* IE11 */
+                    wrapper.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }
+            }
+        }
     </script>
 </body></html>
