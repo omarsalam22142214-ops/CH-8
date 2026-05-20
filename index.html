@@ -77,7 +77,7 @@
             touch-action: manipulation;
         }
 
-        /* ستايل مدخل الثواني الجديد */
+        /* ستايل مدخل الثواني */
         .interval-input-group {
             display: flex;
             align-items: center;
@@ -98,7 +98,7 @@
             font-weight: bold;
         }
 
-        /* ستايل مدخل التشغيل المباشر الجديد */
+        /* ستايل مدخل التشغيل المباشر */
         .direct-input-group {
             display: flex;
             align-items: center;
@@ -123,7 +123,7 @@
             direction: rtl;
         }
 
-        /* ستايل شارات الحالة والجودة */
+        /* شارات الحالة والجودة */
         .status-badge, .quality-badge {
             background: rgba(44, 62, 80, 0.9);
             padding: 4px 8px;
@@ -149,9 +149,10 @@
         .adblock-btn { background-color: rgba(39, 174, 96, 0.9); }
         .adblock-btn.disabled { background-color: rgba(192, 57, 43, 0.9); }
 
+        /* ستايل السيرفرات المربعة */
         .tabs-container {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             overflow-x: auto;
             white-space: nowrap;
             padding-bottom: 5px;
@@ -161,12 +162,12 @@
         .tabs-container::-webkit-scrollbar-thumb { background: rgba(68, 68, 68, 0.8); border-radius: 4px; }
 
         .tab-btn {
-            background-color: rgba(0, 139, 139, 0.9);
-            color: white;
-            border: none;
-            padding: 6px 15px;
+            background-color: transparent;
+            color: #f1c40f; 
+            border: 1px solid #ccc;
+            padding: 8px 20px;
             font-size: 14px;
-            border-radius: 4px;
+            border-radius: 0px; 
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
@@ -174,25 +175,30 @@
             touch-action: manipulation;
         }
 
+        .tab-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
         .tab-btn.active {
-            background-color: #27ae60 !important;
-            border: 2px solid #fff;
-            box-shadow: 0 0 10px rgba(39, 174, 96, 0.8);
+            background-color: #c0392b !important; 
+            color: white !important;
+            border: 1px solid white;
+            box-shadow: none; 
         }
 
         .tab-btn.selected-channel {
             background-color: #8e44ad !important;
             border: 2px dashed #f1c40f;
-            box-shadow: 0 0 10px rgba(142, 68, 173, 0.8);
             transform: scale(0.95);
         }
 
+        /* التصغير الافتراضي 50% */
         .video-wrapper {
             position: relative;
             width: 100%;
             flex: 1; 
             background-color: #000;
-            --zoom-level: 1; /* المتغير المسؤول عن الزوم */
+            --zoom-level: 0.5; 
         }
 
         .video-wrapper iframe,
@@ -213,11 +219,9 @@
             left: 50%;
             width: calc(100vh - 75px);
             height: 100vw;
-            /* دمج الزوم مع التدوير عشان ميحصلش أي خطأ في الأبعاد */
             transform: translate(-50%, -50%) rotate(90deg) scale(var(--zoom-level));
         }
 
-        /* إخفاء المشغلات افتراضياً حتى يتم الاختيار */
         #iframePlayer, #videoPlayer {
             display: none;
         }
@@ -336,7 +340,6 @@
         .s-del-btn { background-color: #e74c3c; }
         .s-close-btn { background-color: #c0392b; border: 1px solid #ff7675; }
 
-        /* ستايل زر إخفاء وإظهار الشريط الجديد */
         .toggle-header-btn {
             position: fixed;
             top: 10px;
@@ -372,22 +375,24 @@
             </div>
             
             <div class="nav-buttons">
-                <div id="streamStatusBadge" class="status-badge" style="color: rgb(231, 76, 60);">🔴 قاطع / خطأ</div>
-                <div id="streamQualityBadge" class="quality-badge" style="display: none; color: rgb(52, 152, 219);">📺 1080p</div>
+                <div id="streamStatusBadge" class="status-badge" style="color: rgb(46, 204, 113);">🟢 شغال</div>
+                <div id="streamQualityBadge" class="quality-badge" style="display: none; color: rgb(52, 152, 219);">📺 --</div>
 
                 <div class="interval-input-group">
                     <label>المدة (5-60ث):</label>
-                    <input type="number" id="autoSwitchIntervalInput" value="20" min="5" max="60" onchange="updateAutoSwitchInterval()" data-ddg-inputtype="unknown">
+                    <input type="number" id="autoSwitchIntervalInput" value="20" min="5" max="60" onchange="updateAutoSwitchInterval()">
                 </div>
 
                 <div class="direct-input-group">
-                    <input type="text" id="directLinkInput" placeholder="رابط m3u8 أو صفحة..." data-ddg-inputtype="unknown">
+                    <input type="text" id="directLinkInput" placeholder="رابط m3u8 أو صفحة...">
                     <button class="nav-btn" style="padding: 4px 8px; font-size: 12px; background-color: #8e44ad;" onclick="playDirectLink()">▶️ تشغيل</button>
                 </div>
 
                 <button id="zoomInBtn" class="nav-btn" style="background-color: #34495e;" title="تكبير">تكبير ➕</button>
                 <button id="zoomOutBtn" class="nav-btn" style="background-color: #34495e;" title="تصغير">تصغير ➖</button>
-                <button id="zoomResetBtn" class="nav-btn" style="background-color: #7f8c8d; color: white;" title="الوضع الافتراضي">100%</button>
+                
+                <button id="zoomResetBtn" class="nav-btn" style="background-color: #7f8c8d; color: white;" title="الحجم المُصغر">50%</button>
+                <button id="zoom100Btn" class="nav-btn" style="background-color: #95a5a6; color: white;" title="الحجم الطبيعي">100%</button>
                 
                 <button id="muteBtn" class="nav-btn" style="background-color: #2c3e50;" onclick="toggleMute()">🔊 الصوت</button>
                 <button id="fullscreenBtn" class="nav-btn" style="background-color: #2c3e50;" onclick="toggleFullScreen()">🔲 ملء الشاشة</button>
@@ -464,7 +469,7 @@
 </div>
     </div>
 
-    <div class="video-wrapper" style="--zoom-level: 1;">
+    <div class="video-wrapper" style="--zoom-level: 0.5;">
         <iframe id="iframePlayer" src="" allowfullscreen="" style="display: none;" sandbox="allow-scripts allow-same-origin"></iframe>
         <video id="videoPlayer" controls="" autoplay="" playsinline="" style="display: none;"></video>
     </div>
@@ -498,19 +503,19 @@
             <h3 style="margin-top:0">إعدادات البث المباشر</h3>
             <div class="form-group">
                 <label>اختار الزرار للتعديل أو الحذف:</label>
-                <select id="buttonSelect" onchange="loadButtonData()" data-ddg-inputtype="unknown"><option value="btn1">WWE MAIN</option><option value="btn1">قناة 1</option><option value="btn2">kick</option><option value="btn2">IPTV</option><option value="btn2">قناة 2</option><option value="btn3">قناة 3</option><option value="btn4">قناة 4</option><option value="btn5">قناة 5</option><option value="btn6">قناة 6</option><option value="btn7">قناة 7</option><option value="btn8">قناة 8</option><option value="btn9">قناة 9</option><option value="btn10">قناة 10</option><option value="btn11">قناة 11</option><option value="btn12">قناة 12</option><option value="btn13">قناة 13</option><option value="btn14">قناة 14</option><option value="btn15">قناة 15</option><option value="btn16">قناة 16</option><option value="btn17">قناة 17</option><option value="btn18">قناة 18</option><option value="btn_new_1776480380175_0">قناة جديدة</option><option value="btn_new_1776480433302_0">قناة جديدة</option><option value="btn_new_1776480531312_0">قناة جديدة</option><option value="btn_new_1776480594111_0">قناة</option><option value="btn_new_1776480641920_0">LQ</option><option value="btn_new_1776480680300_0">قناة جديدة</option><option value="btn_new_1776480819383_0">FHD</option><option value="btn_new_1776480839660_0">قناة جديدة</option><option value="btn_new_1776480858490_0">قناة جديدة</option><option value="btn_new_1776481079193_0">CH 1</option><option value="btn_new_1776481079193_1">CH 2</option><option value="btn_new_1776481079193_2">CH 3</option><option value="btn_new_1776481079193_3">CH 4</option><option value="btn_new_1776483012180_0">240P</option><option value="btn_new_1776483300443_0">USA NETWORK 1</option><option value="btn_new_1776483300443_5">USA NETWORK 6</option><option value="btn_new_1776483359858_0">قناة جديدة</option><option value="btn_new_1776528703537_0">/jaco.live/@wrestlng</option><option value="btn_new_1776549607401_0">85 lq</option><option value="btn_new_1776549825710_0">84 lq</option><option value="btn_new_1776552013457_0">multi</option><option value="btn_new_1776552060825_0">قناة جديدة</option><option value="btn_new_1776552170535_0">قناة جديدة</option><option value="btn_new_1776627363585_0">Feed 1</option><option value="btn_new_1776627363585_1">Feed 2</option><option value="btn_new_1776627363585_2">Feed 3</option><option value="btn_new_1776627363585_3">Feed 4</option><option value="btn_new_1776627363585_4">Feed 5</option><option value="btn_new_1776627363585_5">Feed 6</option><option value="btn_new_1776627363585_6">Feed 7</option><option value="btn_new_1776627363585_7">Feed 8</option><option value="btn_new_1776627363585_8">Feed 9</option></select>
+                <select id="buttonSelect" onchange="loadButtonData()"><option value="btn1">WWE MAIN</option><option value="btn1">قناة 1</option><option value="btn2">kick</option><option value="btn2">IPTV</option><option value="btn2">قناة 2</option><option value="btn3">قناة 3</option><option value="btn4">قناة 4</option><option value="btn5">قناة 5</option><option value="btn6">قناة 6</option><option value="btn7">قناة 7</option><option value="btn8">قناة 8</option><option value="btn9">قناة 9</option><option value="btn10">قناة 10</option><option value="btn11">قناة 11</option><option value="btn12">قناة 12</option><option value="btn13">قناة 13</option><option value="btn14">قناة 14</option><option value="btn15">قناة 15</option><option value="btn16">قناة 16</option><option value="btn17">قناة 17</option><option value="btn18">قناة 18</option><option value="btn_new_1776480380175_0">قناة جديدة</option><option value="btn_new_1776480433302_0">قناة جديدة</option><option value="btn_new_1776480531312_0">قناة جديدة</option><option value="btn_new_1776480594111_0">قناة</option><option value="btn_new_1776480641920_0">LQ</option><option value="btn_new_1776480680300_0">قناة جديدة</option><option value="btn_new_1776480819383_0">FHD</option><option value="btn_new_1776480839660_0">قناة جديدة</option><option value="btn_new_1776480858490_0">قناة جديدة</option><option value="btn_new_1776481079193_0">CH 1</option><option value="btn_new_1776481079193_1">CH 2</option><option value="btn_new_1776481079193_2">CH 3</option><option value="btn_new_1776481079193_3">CH 4</option><option value="btn_new_1776483012180_0">240P</option><option value="btn_new_1776483300443_0">USA NETWORK 1</option><option value="btn_new_1776483300443_5">USA NETWORK 6</option><option value="btn_new_1776483359858_0">قناة جديدة</option><option value="btn_new_1776528703537_0">/jaco.live/@wrestlng</option><option value="btn_new_1776549607401_0">85 lq</option><option value="btn_new_1776549825710_0">84 lq</option><option value="btn_new_1776552013457_0">multi</option><option value="btn_new_1776552060825_0">قناة جديدة</option><option value="btn_new_1776552170535_0">قناة جديدة</option><option value="btn_new_1776627363585_0">Feed 1</option><option value="btn_new_1776627363585_1">Feed 2</option><option value="btn_new_1776627363585_2">Feed 3</option><option value="btn_new_1776627363585_3">Feed 4</option><option value="btn_new_1776627363585_4">Feed 5</option><option value="btn_new_1776627363585_5">Feed 6</option><option value="btn_new_1776627363585_6">Feed 7</option><option value="btn_new_1776627363585_7">Feed 8</option><option value="btn_new_1776627363585_8">Feed 9</option></select>
             </div>
             <div class="form-group">
                 <label>الاسم الجديد:</label>
-                <input type="text" id="editName" data-ddg-inputtype="unknown">
+                <input type="text" id="editName">
             </div>
             <div class="form-group">
                 <label>اللينك الجديد:</label>
-                <input type="text" id="editLink" data-ddg-inputtype="unknown">
+                <input type="text" id="editLink">
             </div>
             <div class="form-group">
                 <label>طريقة الفتح:</label>
-                <select id="editOpenTarget" data-ddg-inputtype="unknown">
+                <select id="editOpenTarget">
                     <option value="internal">داخلي (داخل المشغل)</option>
                     <option value="external">خارجي (في نافذة جديدة)</option>
                 </select>
@@ -530,7 +535,9 @@
     </div>
 
     <script>
-        // === التعديل الجديد: إجبار أي نافذة جديدة أو رابط خارجي إنه يفتح جوه المشغل ===
+        // حفظ دالة الفتح الأصلية
+        const originalWindowOpen = window.open;
+
         window.open = function(url) {
             if (url) {
                 let tempBtn = document.createElement("button");
@@ -557,6 +564,9 @@
         let autoSwitchInterval = null; 
         let remainingSeconds = 20; 
         let activeLinkType = 'iframe'; 
+        
+        let currentZoom = 0.5; 
+        const zoomStep = 0.1;
 
         // === دوال التحكم في حالة البث والجودة ===
         function updateStreamStatus(state) {
@@ -576,7 +586,6 @@
             }
         }
 
-        // ربط مشغل الفيديو بأحداث الحالة
         document.addEventListener("DOMContentLoaded", () => {
             let video = document.getElementById('videoPlayer');
             let iframe = document.getElementById('iframePlayer');
@@ -605,29 +614,34 @@
             playStream(tempBtn);
         }
 
-        let currentZoom = 1;
-        const zoomStep = 0.1;
-
         document.getElementById('zoomInBtn').addEventListener('click', () => {
             currentZoom += zoomStep;
             updateZoom();
         });
 
         document.getElementById('zoomOutBtn').addEventListener('click', () => {
-            if (currentZoom > 0.3) { 
+            if (currentZoom > 0.1) { 
                 currentZoom -= zoomStep;
                 updateZoom();
             }
         });
 
+        // زرار الـ 50% بيرجع الحجم لـ 0.5
         document.getElementById('zoomResetBtn').addEventListener('click', () => {
-            currentZoom = 1;
+            currentZoom = 0.5; 
+            updateZoom();
+        });
+
+        // زرار الـ 100% بيكبر الحجم لـ 1.0
+        document.getElementById('zoom100Btn').addEventListener('click', () => {
+            currentZoom = 1; 
             updateZoom();
         });
 
         function updateZoom() {
             document.querySelector('.video-wrapper').style.setProperty('--zoom-level', currentZoom);
-            document.getElementById('zoomResetBtn').innerText = Math.round(currentZoom * 100) + '%';
+            // لو عايز زرار الـ 50% يفضل مكتوب عليه 50% وميتغيرش رقمه بنسيب السطر ده ملغي أو نمسحه
+            // وثبتنا أسماء الزراير فمفيش داعي الرقم يتغير جواها
         }
 
         function updateAutoSwitchInterval() {
@@ -846,18 +860,18 @@
             document.getElementById('directLinkInput').value = originalLink;
 
             if (target === 'external') {
-                window.open(originalLink, '_blank');
+                originalWindowOpen(originalLink, '_blank');
                 return; 
             }
 
-            // تصفير وتجهيز شارات الحالة
             updateStreamStatus('loading');
             let qualityBadge = document.getElementById('streamQualityBadge');
             qualityBadge.style.display = 'none';
             qualityBadge.innerHTML = '📺 --';
 
-            currentZoom = 1;
+            currentZoom = 0.5;
             updateZoom();
+            
             document.getElementById('muteBtn').innerText = '🔊 الصوت';
 
             let iframe = document.getElementById('iframePlayer');
@@ -887,7 +901,6 @@
                     window.hls.loadSource(linkToPlay);
                     window.hls.attachMedia(video);
                     
-                    // قراءة الجودة عند توفرها أو تغيرها
                     window.hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
                         let level = window.hls.levels[data.level];
                         if(level && level.height) {
@@ -896,7 +909,6 @@
                         }
                     });
 
-                    // مراقبة الأخطاء
                     window.hls.on(Hls.Events.ERROR, function(event, data) {
                         if (data.fatal) {
                             updateStreamStatus('error');
@@ -964,10 +976,10 @@
 
         function openExternal() {
             let activeBtn = document.querySelector('.tab-btn.active');
-            if (activeBtn) window.open(activeBtn.getAttribute('data-link'), '_blank');
+            if (activeBtn) originalWindowOpen(activeBtn.getAttribute('data-link'), '_blank');
             else {
                 let directLink = document.getElementById('directLinkInput').value.trim();
-                if(directLink) window.open(directLink, '_blank');
+                if(directLink) originalWindowOpen(directLink, '_blank');
             }
         }
 
@@ -1131,20 +1143,21 @@
             if (!document.fullscreenElement) {
                 if (wrapper.requestFullscreen) {
                     wrapper.requestFullscreen();
-                } else if (wrapper.webkitRequestFullscreen) { /* Safari */
+                } else if (wrapper.webkitRequestFullscreen) { 
                     wrapper.webkitRequestFullscreen();
-                } else if (wrapper.msRequestFullscreen) { /* IE11 */
+                } else if (wrapper.msRequestFullscreen) { 
                     wrapper.msRequestFullscreen();
                 }
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* Safari */
+                } else if (document.webkitExitFullscreen) { 
                     document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { /* IE11 */
+                } else if (document.msExitFullscreen) { 
                     document.msExitFullscreen();
                 }
             }
         }
     </script>
+
 </body></html>
